@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,15 +12,14 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text HighscoreText;
     public GameObject GameOverText;
-    
+
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
-    
-    // Start is called before the first frame update
     void Start()
     {
         const float step = 0.6f;
@@ -36,6 +36,9 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        UpdateScoreUI();
+        UpdateHighscoreUI();
     }
 
     private void Update()
@@ -62,15 +65,33 @@ public class MainManager : MonoBehaviour
         }
     }
 
-    void AddPoint(int point)
-    {
-        m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
-    }
-
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        GameData.Instance.NewScore(m_Points);
+    }
+
+    void AddPoint(int point)
+    {
+        m_Points += point;
+        UpdateScoreUI();
+    }
+
+    void UpdateScoreUI()
+    {
+        ScoreText.text = $"{GameData.Instance.PlayerName} score: {m_Points}";
+    }
+
+    void UpdateHighscoreUI()
+    {
+        string name = GameData.Instance.HighscorePlayer;
+        int highscore = GameData.Instance.Highscore;
+
+        if (name != null)
+            HighscoreText.text = $"Highscore: {name} - {highscore}";
+        else
+            HighscoreText.text = "Highscore: ---";
+
     }
 }
